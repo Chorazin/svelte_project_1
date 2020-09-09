@@ -1,27 +1,73 @@
 <script>
+  import Button from '../shared/button.svelte';
+  import { createEventDispatcher } from 'svelte';
+
+  let dispatch = createEventDispatcher();
+
   let fields = {question: '', answer_a: '', answer_b: ''};
+  let errors = {question: '', answer_a: '', answer_b: ''};
+  let valid = false;
 
   const submit = () => {
-    console.log(fields);
+    valid = true;
+
+    //check question
+    if(fields.question.trim().length < 5) {
+      valid = false;
+      errors.question = 'Question must be at least 5 chars long';
+    } else {
+      errors.question = '';
+    }
+
+    //check field A
+    if(fields.answer_a.trim().length < 1) {
+      valid = false;
+      errors.answer_a = 'Answer A cannot be empty';
+    } else {
+      errors.answer_a = '';
+    }
+
+    //check field B
+    if(fields.answer_b.trim().length < 1) {
+      valid = false;
+      errors.answer_b = 'Answer B cannot be empty';
+    } else {
+      errors.answer_b = '';
+    }
+
+    //ass a new Poll
+    if(valid) {
+      let poll = {...fields, vote_a: 0, vote_b: 0, id: Math.random()}
+      dispatch('add', poll);
+    }
   }
 </script>
   <form on:submit|preventDefault = {submit}>
     <div class='form_field'>
       <label for='question'>Poll Question:</label>
       <input type='text' id='question' bind:value={fields.question}>
+      <div class='error'>
+        {errors.question}
+      </div>
     </div>
 
     <div class='form_field'>
       <label for='answer_a'>Answer A:</label>
       <input type='text' id='answer_a' bind:value={fields.answer_a}>
+      <div class='error'>
+        {errors.answer_a}
+      </div>
     </div>
 
     <div class='form_field'>
       <label for='answer_b'>Answer B:</label>
       <input type='text' id='answer_b' bind:value={fields.answer_b}>
+      <div class='error'>
+        {errors.answer_b}
+      </div>
     </div>
 
-    <button>Add Poll</button>
+    <Button type='secondary' flat={true}>Add Poll</Button>
   </form>
 <style>
 form {
@@ -42,5 +88,11 @@ input {
 label {
   margin: 10px auto;
   text-align: left;
+}
+
+.error {
+  font-weight: bold;
+  font-size: 12px;
+  color: #d91b42;
 }
 </style>
