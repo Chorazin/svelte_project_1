@@ -1,27 +1,38 @@
 <script>
+  import Card from '../shared/card.svelte';
+  import { createEventDispatcher } from 'svelte';
   export let poll;
-
+  const dispatch = createEventDispatcher();
   //reactive values
   $: total_votes = poll.vote_a + poll.vote_b;
+  $: width_percent_a = Math.floor(100 / total_votes * poll.vote_a);
+  $: width_percent_b = Math.floor(100 / total_votes * poll.vote_b);
+  //handling vote clicks
+  const handle_vote = (option, id) => {
+    dispatch('vote', {option, id});
+  }
 </script>
 
-<div class='poll'>
-  <h3>{poll.question}</h3>
-  <p>Total Votes: {total_votes}</p>
-  <div class='answer'>
-    <div class='percent percent_a'>
 
+<Card>
+  <div class='poll'>
+    <h3>{poll.question}</h3>
+    <p>Total Votes: {total_votes}</p>
+    <div class='answer' on:click={() => handle_vote('a', poll.id)}>
+      <div class='percent percent_a' style='width: {width_percent_a}%'>
+
+      </div>
+      <span>{poll.answer_a} ({poll.vote_a})</span>
     </div>
-    <span>{poll.answer_a} ({poll.vote_a})</span>
-  </div>
 
-  <div class='answer'>
-    <div class='percent percent_b'>
+    <div class='answer' on:click={() => handle_vote('b', poll.id)}>
+      <div class='percent percent_b' style='width: {width_percent_b}%'>
 
+      </div>
+      <span>{poll.answer_b} ({poll.vote_b})</span>
     </div>
-    <span>{poll.answer_b} ({poll.vote_b})</span>
   </div>
-</div>
+</Card>
 
 
 <style>
@@ -51,5 +62,21 @@
   span {
     display: inline-block;
     padding: 10px 20px;
+  }
+
+  .percent {
+    height: 100%;
+    position: absolute;
+    box-sizing: border-box;
+  }
+
+  .percent_a {
+    background: rgba(217,27,66,0.2);
+    border-left: 4px solid #d91b42;
+  }
+
+  .percent_b {
+    background: rgba(69,196,150,0.2);
+    border-left: 4px solid #45c496;
   }
 </style>
