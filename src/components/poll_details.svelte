@@ -1,16 +1,30 @@
 <script>
   import Card from '../shared/card.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import Poll_Store from '../store/poll_store.js';
+
   export let poll;
-  const dispatch = createEventDispatcher();
+
   //reactive values
   $: total_votes = poll.vote_a + poll.vote_b;
   $: width_percent_a = Math.floor(100 / total_votes * poll.vote_a);
   $: width_percent_b = Math.floor(100 / total_votes * poll.vote_b);
   //handling vote clicks
   const handle_vote = (option, id) => {
-    dispatch('vote', {option, id});
-  }
+    Poll_Store.update ((current_data) => {
+      let copied_polls = [...current_data];
+  		let upvoted_poll = copied_polls.find((p) => p.id == id);
+
+  		if(option === 'a') {
+  			upvoted_poll.vote_a++;
+  		};
+
+  		if(option === 'b') {
+  			upvoted_poll.vote_b++;
+  		};
+
+  		return copied_polls;
+    });
+  };
 </script>
 
 
