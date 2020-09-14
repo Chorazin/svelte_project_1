@@ -2,13 +2,22 @@
   import Card from '../shared/card.svelte';
   import Poll_Store from '../store/poll_store.js';
   import Button from '../shared/button.svelte';
+  import { tweened } from 'svelte/motion';
 
   export let poll;
 
   //reactive values
   $: total_votes = poll.vote_a + poll.vote_b;
-  $: width_percent_a = Math.floor(100 / total_votes * poll.vote_a);
-  $: width_percent_b = Math.floor(100 / total_votes * poll.vote_b);
+  $: width_percent_a = Math.floor(100 / total_votes * poll.vote_a) || 0;
+  $: width_percent_b = Math.floor(100 / total_votes * poll.vote_b) || 0;
+
+  //tweened percentages
+  const tweened_a = tweened(0);
+  const tweened_b = tweened(0);
+  $:tweened_a.set(width_percent_a);
+  $:tweened_b.set(width_percent_b);
+  // $:console.log($tweened_a, $tweened_b);
+
   //handling vote clicks
   const handle_vote = (option, id) => {
     Poll_Store.update ((current_data) => {
@@ -43,14 +52,14 @@
     <h3>{poll.question}</h3>
     <p>Total Votes: {total_votes}</p>
     <div class='answer' on:click={() => handle_vote('a', poll.id)}>
-      <div class='percent percent_a' style='width: {width_percent_a}%'>
+      <div class='percent percent_a' style='width: {$tweened_a}%'>
 
       </div>
       <span>{poll.answer_a} ({poll.vote_a})</span>
     </div>
 
     <div class='answer' on:click={() => handle_vote('b', poll.id)}>
-      <div class='percent percent_b' style='width: {width_percent_b}%'>
+      <div class='percent percent_b' style='width: {$tweened_b}%'>
 
       </div>
       <span>{poll.answer_b} ({poll.vote_b})</span>
